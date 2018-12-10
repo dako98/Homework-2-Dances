@@ -3,6 +3,7 @@
 
 #include <string>
 #include <assert.h>
+#include <iostream>
 
 enum Neighbours
 {
@@ -100,8 +101,64 @@ public:
 		}
 	}
 
+	void Connect(Dancer &newcomer, Dancer &first, Dancer &second)
+	{
+		if (&newcomer == &first|| &newcomer==&second)
+		{
+			assert(false);
+			//throw std::invalid_argument("Cloning people is not permitted.");
+		}
 
+		//Are they neighbours
+		if (first.left == &second && second.right == &first)
+		{
+			first.left = &newcomer;
+			newcomer.right = &first;
+			second.right = &newcomer;
+			newcomer.left = &second;
+			newcomer.Grab(BOTH);
+			first.Grab(LEFT);
+			second.Grab(RIGHT);
+		}
+		else if (first.right == &second && second.left == &first)
+		{
+			first.right = &newcomer;
+			newcomer.left = &first;
+			second.left = &newcomer;
+			newcomer.right = &second;
+			newcomer.Grab(BOTH);
+			first.Grab(RIGHT);
+			second.Grab(LEFT);
+		}
+		else
+		{
+			throw std::invalid_argument("Dancers are not neighbours.");
+		}
 
+	}
+
+	void Print() const
+	{
+		if (this->left->status == RIGHT || this->left->status == BOTH)
+		{
+			std::cout << '>';
+		}
+		else
+		{
+			std::cout << '-';
+		}
+
+		std::cout << name;
+
+		if (this->right->status == LEFT || this->left->status == BOTH)
+		{
+			std::cout << '<';
+		}
+		else
+		{
+			std::cout << '-';
+		}
+	}
 
 private:
 
