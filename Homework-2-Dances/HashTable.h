@@ -2,30 +2,62 @@
 #define _HAST_TABLE_
 
 #include <vector>
-//#include <forward_list>
 #include <list>
 #include "Dancer.h"
 
-// const size_t MAX_CHAIN_LENGTH = 64;
 
 using Chain = std::list<Dancer*>;
 using DataContainer = std::vector<Chain>;
+
+
 
 class HashTable
 {
 
 public:
 
-	HashTable()
+	HashTable(const Dancer &first, const Dancer &right)
 		:capacity(4)
+		, count(0)
 		, longestChain(0)
 	{
 		table.resize(capacity);
+
+		addToHash(first);
+		addToHash(right);
+
+		Dancer* _first = find(first);
+		Dancer* _right = find(right);
+
+		this->first = _first;
+
+		_first->Initialise(*_right);
+		
 	}
 
 
+	void add(Dancer& newcomer, Dancer& left, Dancer& right)
+	{
+		Dancer* _left = find(left);
+		Dancer* _right = find(right);
+
+		addToHash(newcomer);
+		Dancer* _newcomer = find(newcomer);
+
+		try {
+			_newcomer->Connect(_left, _right);
+		}
+		catch (std::invalid_argument &e)
+		{
+			std::cout << e.what();
+			return;
+		}
+	}
+
+
+
 	//Think about double hashing.
-	void add(const Dancer &dancer)
+	void addToHash(const Dancer &dancer)
 	{
 		if (find(dancer) == nullptr)
 		{//Adding new dancer
@@ -48,6 +80,7 @@ public:
 			}
 			return;
 		}
+
 		throw std::invalid_argument("No clones!");
 	}
 
@@ -70,7 +103,7 @@ public:
 	{
 		int index = dancer.hash(capacity);
 
-		for (Dancer* current : table[index])
+		for (Dancer*& current : table[index])
 		{
 			if (current->GetName() == dancer.GetName())
 			{
@@ -90,24 +123,47 @@ public:
 		return false;
 	}
 
-	void Print() const
+	void PrintChains() const
 	{
 		for (const Chain &chain : table)
 		{
 			for (const Dancer* dancer : chain)
-				std::cout << dancer->GetName() << ' ';
+			{
+				dancer->Print();
+			}
 			std::cout << '\n';
 		}
 	}
 
+	void Print() const
+	{
+		_Print(*first->GetRight());
+	}
+
+	void _Print(const Dancer &current) const
+	{
+		if (current.GetName() == first->GetName())
+		{
+			current.Print();
+			return;
+		}
+		else
+		{
+			current.Print();
+			std::cout << "---";
+			_Print(*current.GetRight());
+		}
+	}
 
 private:
 
 	DataContainer table;
 
+	size_t count;
 	size_t capacity;
 	size_t longestChain;
 
+	Dancer* first;
 };
 
 

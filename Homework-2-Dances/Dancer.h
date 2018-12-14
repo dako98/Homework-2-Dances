@@ -29,7 +29,7 @@ public:
 			break;
 		case LEFT:
 
-			if (status==NONE)
+			if (status == NONE)
 			{
 				status = LEFT;
 			}
@@ -101,34 +101,48 @@ public:
 		}
 	}
 
-	void Connect(Dancer &newcomer, Dancer &first, Dancer &second)
+	void Initialise(Dancer &right)
 	{
-		if (&newcomer == &first || &newcomer == &second)
-		{
-			assert(false);
-			//throw std::invalid_argument("Cloning people is not permitted.");
-		}
+		this->left = &right;
+		this->right = &right;
+		this->status = BOTH;
 
-		//Are they neighbours
-		if (first.left == &second && second.right == &first)
+		right.left = this;
+		right.right = this;
+		right.status = BOTH;
+
+	}
+
+	void Connect(Dancer *left, Dancer *right)
+	{
+//		if (this == &left || this == &right)
+//		{
+//			assert(false);
+//			//throw std::invalid_argument("Cloning people is not permitted.");
+//		}
+
+		//Are they neighbours and need swapping
+		if (left->left == right &&
+			right->right == left && 
+			(left->right!=left->left))
 		{
-			first.left = &newcomer;
-			newcomer.right = &first;
-			second.right = &newcomer;
-			newcomer.left = &second;
-			newcomer.Grab(BOTH);
-			first.Grab(LEFT);
-			second.Grab(RIGHT);
+			std::swap(right, left);
 		}
-		else if (first.right == &second && second.left == &first)
+		if (left->right == right &&
+			right->left == left)
 		{
-			first.right = &newcomer;
-			newcomer.left = &first;
-			second.left = &newcomer;
-			newcomer.right = &second;
-			newcomer.Grab(BOTH);
-			first.Grab(RIGHT);
-			second.Grab(LEFT);
+
+			this->right = right;
+			this->left = left;
+			this->Grab(BOTH);
+
+			left->right = this;
+			right->left = this;
+
+			left->Grab(RIGHT);
+			right->Grab(LEFT);
+			
+
 		}
 		else
 		{
@@ -185,6 +199,31 @@ public:
 		return status == NONE && left->status < RIGHT && right->status < LEFT;
 	}
 
+	Dancer* GetRight() const
+	{
+		return right;
+	}
+
+	bool operator==(const Dancer &other)
+	{
+		return this->GetName() == other.GetName();
+	}
+
+	/*
+	void Swap(Dancer &other)
+	{
+		//Changing with left neighbour
+		if (*this->left == other &&
+			other.right == this)
+		{
+			if ((this->status==NONE || this->status==LEFT) &&
+				(other.status==NONE || other.status==RIGHT))
+			{
+				swap(*this.name)
+			}
+		}
+	}
+	*/
 private:
 
 	std::string name;
