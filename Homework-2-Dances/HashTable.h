@@ -2,18 +2,26 @@
 #define _HAST_TABLE_
 
 #include <vector>
-#include <forward_list>
+//#include <forward_list>
+#include <list>
 #include "Dancer.h"
 
 // const size_t MAX_CHAIN_LENGTH = 64;
 
-using Chain = std::forward_list<Dancer*>;
+using Chain = std::list<Dancer*>;
 using DataContainer = std::vector<Chain>;
 
 class HashTable
 {
 
 public:
+
+	HashTable()
+		:capacity(4)
+		, longestChain(0)
+	{
+		table.resize(capacity);
+	}
 
 
 	//Think about double hashing.
@@ -26,17 +34,21 @@ public:
 			{
 				Rehash();
 			}
+
 			int index = dancer.hash(capacity);
 
 			Dancer* tmp = new Dancer(dancer);
 
 			table[index].push_front(tmp);
-			if (longestChain < table[index].size())	//Think of a way to keep chain length. Either tuple or list.
-			{
 
+			//Get longest chain count.
+			if (longestChain < table[index].size())
+			{
+				longestChain = table[index].size();
 			}
+			return;
 		}
-		
+		throw std::invalid_argument("No clones!");
 	}
 
 	void Rehash()
@@ -78,7 +90,15 @@ public:
 		return false;
 	}
 
-
+	void Print() const
+	{
+		for (const Chain &chain : table)
+		{
+			for (const Dancer* dancer : chain)
+				std::cout << dancer->GetName() << ' ';
+			std::cout << '\n';
+		}
+	}
 
 
 private:

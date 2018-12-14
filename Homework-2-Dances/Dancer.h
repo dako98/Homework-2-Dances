@@ -103,7 +103,7 @@ public:
 
 	void Connect(Dancer &newcomer, Dancer &first, Dancer &second)
 	{
-		if (&newcomer == &first|| &newcomer==&second)
+		if (&newcomer == &first || &newcomer == &second)
 		{
 			assert(false);
 			//throw std::invalid_argument("Cloning people is not permitted.");
@@ -169,8 +169,8 @@ public:
 	{
 		size_t hash = 0;
 
-		const char* name = this->GetName().c_str();
-		size_t len = strlen(name);
+//		const char* name = this->GetName().c_str();
+		size_t len = name.length();
 
 		for (size_t i = 0; i < len; i++)
 		{
